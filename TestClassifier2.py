@@ -23,31 +23,32 @@ print sum((X.T*Y).T)
 print "--------------------------"
 outerSum = 0
 for i in xrange(X.shape[0]):
-    outerSum += Y[i]*X[i] * innerSum
+    outerSum += Y[i]*X[i]
 print "Outer sum:",outerSum
 
+print outerSum.dot(innerSum)
 
-print sum((Y*X.T).T*innerSum)
+
+print sum((Y*X.T).T.dot(innerSum))
 
 
 print "---------------------"
-# 
-# print X.T
-# print X.T*Y
-# print X.dot(X)
-# print (Y*Y*X).dot(X)
 
-print np.inner(np.inner(Y,Y),X.dot(X))
-print np.inner(X,X.T)
-print X.dot(X)
+print sum(sum(   (Y**2)*(X**2) ))
+print Y*Y*X.dot(X)
+print (Y*Y)*(X.T).dot((X.T))
+print Y*(Y*X.T).dot((X.T))
+print sum(   sum(  Y*(Y*X.T).dot((X.T))  )  )
+print sum( sum(np.outer(Y,Y)*X.T.dot(X.T)) )
 
 
-formula = (X.T*Y).T.dot((X.T*Y).T)
-formula = (X.T*Y).T.dot((X.T*Y).T)
-formula2 = Y*Y.T*(X.dot(X)).T
-print formula
-print sum(formula)
-# print sum(formula2)
+
+print Y*(Y*X.T)
+print np.outer(Y,Y)*X.T
+
+
+#A.dot(B*C) = ?
+
 
 # A*sum(B) = A.dot(B) 
 

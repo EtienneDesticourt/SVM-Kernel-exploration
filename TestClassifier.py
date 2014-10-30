@@ -5,9 +5,10 @@ Created on 24 Oct 2014
 
 import numpy as np
 import matplotlib.pyplot as plt
+from pylab import *
+from Classifier import Classifier
 
-
-
+#TEST 1
 
 #We create two columns of points with 4 points in each for each class
 cols = 2 #columns of points not cols of matrix
@@ -34,38 +35,45 @@ Y2 = -np.ones(cols*rows)
 X = np.concatenate((X1,X2))
 Y = np.concatenate((Y1,Y2))
 
-print X.shape
+#TEST 2
 
-result = 0
-print X
-for i in xrange(X.shape[0]):
-    temp = Y[i]*X[i]
-#     print "Temp:",temp
-    temp2 = 0
-    for j in xrange(X.shape[0]):
-        temp2 += Y[j]*X[j]
-#         print "Product:",Y[j]*X[j]
-#         print "Temp2",temp2
-#     print "Temp2",temp2
-    temp *= temp2
-#     print "Temp:",temp
-#     print "-------------------"
-#     raw_input()
+Y = np.array([1.,1.,-1.,-1.,1.,1.,-1.,-1.,1.,1.,-1.,-1.,1.,1.,-1.,-1.])
+X1 = X[Y==1.]
+X2 = X[Y==-1.]
+ 
+#TEST 3
+  
+Y = np.array([1.,1.,1.,1.,1.,1.,1.,-1.,1.,1.,-1.,-1.,1.,-1.,-1.,-1.])
+X1 = X[Y==1.]
+X2 = X[Y==-1.]
 
-print temp
-print (Y*X.T).T*temp2
 
-print "End test one."
 
-# print X,Y
-print Y
-np.dot(X,X.T)
-print sum(Y*Y.dot(np.dot(X,X.T)))
-# print np.dot(X1,X2)
 
+
+
+
+
+
+
+C = Classifier()
+w,alpha = C.findHyperplane(X,Y)
+b = C.calcOffset(X, Y, alpha)
+print w,b
+w = w[0]
+
+def f(x,y): return (w[0]*x+w[1]*y + b) 
+
+n = 256
+x = np.linspace(0,10,n)
+y = np.linspace(0,10,n)
+X,Y = np.meshgrid(x,y)
+
+c = contourf(X, Y, f(X,Y), 8, alpha=.75, cmap='jet')
+cont = contour(X, Y, f(X,Y), 8, colors='black', linewidth=.5)
+plt.colorbar(c)
+C.plotLinearBoundary(w, b)
 plt.plot(X1.T[0],X1.T[1],"ro")
 plt.plot(X2.T[0],X2.T[1],"bo")
 plt.axis([0,10,0,6])
 plt.show()
-
-#We want the hyperplane to be a vertical line with x = 5
