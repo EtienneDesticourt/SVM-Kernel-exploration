@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pylab import *
 from Classifier import Classifier
+from math import tanh
 
 #TEST 1
 
@@ -36,18 +37,25 @@ X = np.concatenate((X1,X2))
 Y = np.concatenate((Y1,Y2))
 
 #TEST 2
-
-Y = np.array([1.,1.,-1.,-1.,1.,1.,-1.,-1.,1.,1.,-1.,-1.,1.,1.,-1.,-1.])
-X1 = X[Y==1.]
-X2 = X[Y==-1.]
- 
-#TEST 3
-  
+Y = np.array([1.,1.,-1.,-1.,1.,1.,-1.,-1.,1.,1.,-1.,-1.,1.,1.,-1.,-1.]) 
+#TEST 3  
 Y = np.array([1.,1.,1.,1.,1.,1.,1.,-1.,1.,1.,-1.,-1.,1.,-1.,-1.,-1.])
+#TEST 4
+# Y = np.array([1.,1.,-1.,-1.,1.,1.,1.,-1.,1.,1.,-1.,-1.,1.,-1.,-1.,-1.])
+#TEST 5: circle
+Y = np.array([-1.,-1.,-1.,-1.,-1.,1.,1.,-1.,-1.,1.,1.,-1.,-1.,-1.,-1.,-1.])
+#TEST 6
+Y = np.array([1.,-1.,-1.,-1.,1.,1.,1.,-1.,1.,-1.,-1.,-1.,1.,1.,1.,-1.])
+#TEST 7
+Y = np.array([1.,1.,-1.,-1.,1.,1.,1.,-1.,1.,1.,-1.,-1.,1.,-1.,-1.,-1.])
+#TEST 8
+Y = np.array([1.,1.,-1.,-1.,1.,1.,1.,-1.,1.,1.,-1.,-1.,1.,-1.,-1.,-1.])
+
+
+
+
 X1 = X[Y==1.]
 X2 = X[Y==-1.]
-
-
 
 
 
@@ -57,22 +65,50 @@ X2 = X[Y==-1.]
 
 
 C = Classifier()
-w,alpha = C.findHyperplane(X,Y)
-b = C.calcOffset(X, Y, alpha)
-print w,b
-w = w[0]
+kernel = C.calcExpKernel(X)
+alpha = C.solveAlpha(kernel, Y)
+b = C.calcOffset(kernel, Y, alpha)
 
-def f(x,y): return (w[0]*x+w[1]*y + b) 
+
+sX = X[C.findIndexes(alpha)]
+sAlpha = alpha[C.findIndexes(alpha)]
+sY = Y[C.findIndexes(alpha)]
+
+# def f(x,y): return (w[0]*x+w[1]*y + b) #old method
+ 
+#For non linear classification we don't want to actually map x to a higher space
+#because it's too computationally expensive
+#so instead of calculating w (which requires the higher space) we use the kernel directly
+def fPoly(x,y): 
+    temp = sAlpha.T*sY
+    r = 0
+    for i in xrange(len(temp[0])):
+        r += temp[0][i]*((sX[i][0]*x + sX[i][1]*y + 1)**2)    
+    return r + b
+
+def fSig(x,y):    
+    temp = sAlpha.T*sY
+    r = 0
+    for i in xrange(len(temp[0])):
+        r += temp[0][i]*(np.tanh(sX[i][0]*x + sX[i][1]*y + 1))    
+    return r + b
+
+def fExp(x,y):     
+    temp = sAlpha.T*sY
+    r = 0
+    for i in xrange(len(temp[0])):
+#         r += temp[0][i]*(np.exp( (sX[i][0]-x)**2 + (sX[i][1]-y)**2 ))    
+        r += temp[0][i]*(np.exp( -0.5*( (sX[i][0]-x)**2 + (sX[i][1]-y)**2))) 
+    return r + b
 
 n = 256
 x = np.linspace(0,10,n)
 y = np.linspace(0,10,n)
-X,Y = np.meshgrid(x,y)
+Xm,Ym = np.meshgrid(x,y)
 
-c = contourf(X, Y, f(X,Y), 8, alpha=.75, cmap='jet')
-cont = contour(X, Y, f(X,Y), 8, colors='black', linewidth=.5)
+c = contourf(Xm, Ym, fExp(Xm,Ym), 8, alpha=.75, cmap='jet')
+cont = contour(Xm, Ym, fExp(Xm,Ym), 8, colors='black', linewidth=.5)
 plt.colorbar(c)
-C.plotLinearBoundary(w, b)
 plt.plot(X1.T[0],X1.T[1],"ro")
 plt.plot(X2.T[0],X2.T[1],"bo")
 plt.axis([0,10,0,6])
