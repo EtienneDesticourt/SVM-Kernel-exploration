@@ -1,0 +1,7 @@
+Application of the support vector machine algorithm to identify block ciphers.
+Very interesting project but didn't have time to finish it.
+
+Possible ameliorations: Fix the sigmoid kernel, add soft margin.
+
+Skills acquired: SVMs, SVM kernels
+Skills consolidated: numpy, matrix operations, going from scalar operations to matricial operations, plotting (matplotlib)
